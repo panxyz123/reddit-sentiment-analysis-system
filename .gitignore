@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+requirements.txt.bak
+
+# Secrets & Config
+.env
+.env.local
+!.env.example
+
+# Docker & Persistence
+postgres_data/
+kafka_data/
+*.log
+
+# Models (Weights & Large Files)
+model/
+model_onnx_quantized/
+
+# OS
+.DS_Storemodel_onnx_quantized/
+__pycache__/
+.env
+.DS_Store

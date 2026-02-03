@@ -1,0 +1,119 @@
+
+services:
+  # logic and application layer: FastAPI app
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentiment-api
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis_cache 
+      - REDIS_PORT=6379
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}  
+      - S3_MODEL_PREFIX=model_raw/
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=us-west-1
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
+      - REDDIT_USER_AGENT=${REDDIT_USER_AGENT}
+    deploy:
+      resources:
+        limits:
+          memory: 4G 
+        reservations:
+          memory: 1G
+    volumes:
+      - .:/app
+    depends_on:
+      - redis_cache
+    networks:
+      - sentiment_network
+
+  # storage layer: Redis
+  redis_cache:
+    image: redis:alpine3.22
+    container_name: sentiment-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - sentiment_network
+
+  # cache warmer service
+  cache-warmer:
+    build: .
+    container_name: container-cache-warmer-1
+    command: python cache_warmer.py  
+    volumes:
+      - .:/app
+    environment:
+      - REDIS_HOST=redis_cache 
+      - REDIS_PORT=6379
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}  
+      - S3_MODEL_PREFIX=model_raw/
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=us-west-1
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
+      - REDDIT_USER_AGENT=${REDDIT_USER_AGENT}
+    depends_on:
+      - api
+      - redis_cache
+    networks:
+      - sentiment_network
+
+  # storage layer: PostgreSQL
+  sentiment-db:
+    image: postgres:alpine3.23
+    container_name: sentiment-postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sentiment_network
+
+  # messaging layer: Kafka
+  kafka:
+      image: apache/kafka:4.2.0-rc3
+      container_name: kafka-service
+      ports:
+        - "9092:9092"
+      command: python sync_kafka_to_pg.py
+      environment:
+        - KAFKA_NODE_ID=1
+        - KAFKA_PROCESS_ROLES=broker,controller
+        - KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093
+        
+        - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+        - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+        - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+        - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+        
+        - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+        - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+        - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+        - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+        
+        - KAFKA_HEAP_OPTS=-Xmx512m -Xms512m
+      networks:
+        - sentiment_network
+
+networks:
+  sentiment_network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  postgres_data:

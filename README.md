@@ -119,6 +119,7 @@ The system connects to PostgreSQL via a Live Connection to provide real-time bus
 ![alt text](assets/pct_emotion.png)
 
 Confidence vs. Sentiment Scatter Plot: Identifying model uncertainty and outlier detection.
+![alt text](<assets/conf_pct_per emotion.png>)
 
 ## 🛠️ Tech Stack
 **Infrastructure & Orchestration**
@@ -176,7 +177,7 @@ The API returns a comprehensive JSON object designed for seamless integration wi
     "time": 0.145
 }
 ```
-- Output plot exsample
+- Output plot example
 ![alt text](/assets/plot.png)
 
 

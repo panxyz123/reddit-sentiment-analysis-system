@@ -1,6 +1,6 @@
-# 🚀 Distributed Real-Time Sentiment Analysis Pipeline with End-to-End Fine-tuning and Resource-Efficient Design
+# 🚀 Distributed Real-Time Sentiment Analysis Pipeline
 
-## 🎯 Project Core: Real-time Sentiment Intelligence
+## 🎯 Project Core
 This project implements a high-throughput sentiment analysis pipeline for Public Opinion Monitoring. When a user queries a keyword, the system executes a Resource-Aware Workflow:
 
 - **Dynamic Data Fetching**: Utilizes a Reddit API to fetch real-time posts.
@@ -30,7 +30,7 @@ This project implements a high-throughput sentiment analysis pipeline for Public
 │   ├── stress_test.sh          # Concurrency & latency stress test script
 │   ├── cache_warmer.sh         # CPU-aware automatic hot keywords cache script
 │   └── sync_kafka_to_pg.py     # CPU-aware Redis to Postgres sync script
-├── database/            
+├── init_db/            
 │   └── init.sql                # Initialize database
 ├── docker-compose.yml          # Orchestration for API, Kafka, Redis, and PG
 ├── Dockerfile                  # API container definition
@@ -42,7 +42,6 @@ This project implements a high-throughput sentiment analysis pipeline for Public
 
 
 ## 🧠 Model End-to-End Fine-tuning Details
-### Datasets and Objective
 - Base Model: distilbert-base-uncased (Chosen for its balance between performance and parameter efficiency).
 
 - Dataset: Hugging Face `emotion`
@@ -90,7 +89,12 @@ Containerized Orchestration: Fully containerized environment using Docker & ECR,
 By implementing a Cache-Aside Pattern with Redis, the system bypasses expensive Transformer inference for redundant queries, achieving massive latency reduction.
 
 Stress Test Performance Metrics (~250 posts per keyword): 
-| Metric | Model Inference (Cold Start) | Redis Cache Hit (Hot) | Improvement | | :--- | :--- | :--- | :--- | | CPU Latency | ~40,000 ms | ~200 ms | 2000x | | CPU Utilization | 85% - 95% | < 2% | 45x Efficiency | | Throughput | ~5 req/s | 10,000+ req/s | Scalability Boost |
+
+| Metric | Model Inference (Cold Start) | Redis Cache Hit (Hot) | Improvement | 
+| :--- | :--- | :--- | :--- | 
+| CPU Latency | ~40,000 ms | ~200 ms | 2000x | 
+| CPU Utilization | 85% - 95% | < 2% | 45x Efficiency | 
+| Throughput | ~5 req/s | 10,000+ req/s | Scalability Boost |
 
 
 ### 3️⃣ Intelligent "CPU-Aware" ETL Engine
@@ -111,7 +115,8 @@ PostgreSQL (Durability): Acts as the "Source of Truth" for structured historical
 ## 📊 Data Visualization (Tableau)
 The system connects to PostgreSQL via a Live Connection to provide real-time business insights:
 
-6-Dimensional Sentiment Stacked Bar Chart: Comparative analysis of emotions (Joy, Anger, etc.) across different keywords.
+6-Dimensional Sentiment Stacked Bar Chart: Comparative analysis of emotions (Joy, Anger, etc.) across different keywords. 
+![alt text](assets/pct_emotion.png)
 
 Confidence vs. Sentiment Scatter Plot: Identifying model uncertainty and outlier detection.
 
@@ -138,7 +143,6 @@ Confidence vs. Sentiment Scatter Plot: Identifying model uncertainty and outlier
 - BI & Visualization: Tableau Desktop (Connected to PG for sentiment distribution and keyword frequency dashboards).
 
 ## 📡 API Specification
-### Query Format
 ### **Query Format (Input)**
 The API expects a `POST` request with a JSON body defining the search criteria:
 
@@ -148,7 +152,7 @@ The API expects a `POST` request with a JSON body defining the search criteria:
     
 - **`return_plot`** (Boolean): If `true`, the API returns a Base64 encoded string of the sentiment distribution plot.
 
-### Result Presentation (Output)
+### **Result Presentation (Output)**
 The API returns a comprehensive JSON object designed for seamless integration with frontend dashboards and BI tools like Tableau:
 ```
 {
@@ -175,8 +179,7 @@ The API returns a comprehensive JSON object designed for seamless integration wi
 - Output plot exsample
 ![alt text](/assets/plot.png)
 
-- Tableau visualization example
-![alt text](assets/pct_emotion.png)
+
 
 
 ## ⚙️ Deployment & Usage
@@ -187,8 +190,8 @@ The API returns a comprehensive JSON object designed for seamless integration wi
 - Model Loading: The system automatically pulls the latest ONNX weights from S3 on startup.
 
 - Quick Start running analysis: 
-    - Analyze ~250 posts about "AI" (Default): `./scripts/stress_test.sh`
-    - Start concurrent burst of multiple users: `./scripts/stress_test.sh "FinTech" 200`
+    - Analyze ~250 posts about "AI" (Default): `./scripts/predict_client.sh`
+    - Start concurrent burst of multiple users: `./scripts/stress_test.sh`
 
 
 

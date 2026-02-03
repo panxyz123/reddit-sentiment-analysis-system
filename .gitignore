@@ -16,10 +16,10 @@ kafka_data/
 
 # Models (Weights & Large Files)
 model/
-model_onnx_quantized/
 
 # OS
 .DS_Storemodel_onnx_quantized/
 __pycache__/
 .env
 .DS_Store
+assets/.DS_Store

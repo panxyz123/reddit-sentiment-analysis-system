@@ -95,12 +95,14 @@ Stress Test Performance Metrics (~250 posts per keyword):
 | CPU Latency | ~40,000 ms | ~200 ms | 2000x | 
 | CPU Utilization | 85% - 95% | < 2% | 45x Efficiency | 
 | Throughput | ~5 req/s | 10,000+ req/s | Scalability Boost |
+![alt text](assets/stress-test.png)
 
 
 ### 3️⃣ Intelligent "CPU-Aware" ETL Engine
 Designed a robust, Self-Adaptive Sync Script that monitors system health before execution:
 
 - Redis Hot-Words Cache (Threshold < 35%): The system automatically activates the "Hot Words" extraction logic when CPU usage drops below 35%. This preemptively caches high-frequency keywords in Redis to speed up subsequent analytical queries.
+![alt text](assets/cpu-aware-etl.png)
 
 - PostgreSQL Synchronization (Threshold < 20%): Data persistence from Redis to PostgreSQL only triggers when the system enters a deep idle state (< 20% CPU). This ensures that heavy Disk I/O and DB handshakes do not cause latency jitter for real-time inference requests.
 
@@ -189,6 +191,9 @@ The API returns a comprehensive JSON object designed for seamless integration wi
 - Infrastructure Up: `docker-compose up -d`
 
 - Model Loading: The system automatically pulls the latest ONNX weights from S3 on startup.
+
+- Real-time Monitoring: `lazydocker`
+![alt text](assets/lazydocker.png)
 
 - Quick Start running analysis: 
     - Analyze ~250 posts about "AI" (Default): `./scripts/predict_client.sh`

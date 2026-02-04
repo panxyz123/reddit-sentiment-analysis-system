@@ -95,6 +95,7 @@ Stress Test Performance Metrics (~250 posts per keyword):
 | CPU Latency | ~40,000 ms | ~200 ms | 2000x | 
 | CPU Utilization | 85% - 95% | < 2% | 45x Efficiency | 
 | Throughput | ~5 req/s | 10,000+ req/s | Scalability Boost |
+
 ![alt text](assets/stress-test.png)
 
 
@@ -181,7 +182,6 @@ The API returns a comprehensive JSON object designed for seamless integration wi
 ```
 - Output plot example
 ![alt text](/assets/plot.png)
-
 
 
 

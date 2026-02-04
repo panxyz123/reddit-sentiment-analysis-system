@@ -92,7 +92,7 @@ Stress Test Performance Metrics (~250 posts per keyword):
 
 | Metric | Model Inference (Cold Start) | Redis Cache Hit (Hot) | Improvement | 
 | :--- | :--- | :--- | :--- | 
-| CPU Latency | ~40,000 ms | ~200 ms | 2000x | 
+| CPU Latency | ~400,000 ms | ~200 ms | 2000x | 
 | CPU Utilization | 85% - 95% | < 2% | 45x Efficiency | 
 | Throughput | ~5 req/s | 10,000+ req/s | Scalability Boost |
 
